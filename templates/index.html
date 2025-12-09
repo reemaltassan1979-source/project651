@@ -1,123 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scene Classifier</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intel Scene Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="page">
-    <header class="hero">
-      <p class="eyebrow">Intel Image Scene Model</p>
-      <h1>Classify an image in seconds</h1>
-      <p class="lede">Drop a photo and our Keras model will predict the scene. Supported classes: buildings, forest, glacier, mountain, sea, street.</p>
-    </header>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-area">
-          {% for category, message in messages %}
-            <div class="flash {{ category }}">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-
-    <main class="layout">
-      <section class="card upload">
-        <form id="upload-form" action="/" method="POST" enctype="multipart/form-data">
-          <label for="image" class="dropzone" id="dropzone">
-            <div class="drop-icon">⬆</div>
-            <div>
-              <p class="dz-title">Upload or drop an image</p>
-              <p class="dz-sub">JPG, PNG, or GIF up to 8MB</p>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <i class="fas fa-image header-icon"></i>
+                <h1>Intel Scene Classifier</h1>
+                <p class="subtitle">Upload an image to classify the scene using AI</p>
             </div>
-            <input id="image" name="image" type="file" accept="image/*" required hidden />
-          </label>
-          <div class="preview" id="preview" hidden>
-            <img id="preview-img" alt="Preview" />
-            <p id="preview-name"></p>
-          </div>
-          <button type="submit" class="button">Run Classification</button>
-        </form>
-      </section>
+        </header>
 
-      <section class="card results">
-        {% if prediction %}
-          <div class="badge">Top class</div>
-          <h2 class="result-label">{{ prediction.label|capitalize }}</h2>
-          <p class="confidence">Confidence: {{ prediction.confidence }}</p>
-          <div class="top3">
-            {% for label, score in prediction.top3 %}
-              <div class="top-item">
-                <span>{{ label|capitalize }}</span>
-                <span>{{ '%.1f' % (score * 100) }}%</span>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="placeholder">
-            <p>No prediction yet.</p>
-            <p class="muted">Upload an image to see model results.</p>
-          </div>
-        {% endif %}
-      </section>
-    </main>
-  </div>
+        <main>
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <h2>Drop your image here</h2>
+                    <p>or click to browse</p>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                    <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </button>
+                    <p class="file-types">Supports: JPG, PNG, GIF, BMP</p>
+                </div>
+            </div>
 
-  <script>
-    const dropzone = document.getElementById('dropzone');
-    const input = document.getElementById('image');
-    const preview = document.getElementById('preview');
-    const previewImg = document.getElementById('preview-img');
-    const previewName = document.getElementById('preview-name');
+            <div class="preview-section" id="previewSection" style="display: none;">
+                <div class="image-preview">
+                    <button class="close-btn" onclick="resetUpload()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <img id="imagePreview" src="" alt="Preview">
+                    <button class="classify-btn" id="classifyBtn">
+                        <i class="fas fa-magic"></i> Classify Image
+                    </button>
+                </div>
+            </div>
 
-    dropzone.addEventListener('click', () => input.click());
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="result-card">
+                    <div class="result-header">
+                        <i class="fas fa-check-circle success-icon"></i>
+                        <h2>Classification Results</h2>
+                    </div>
+                    
+                    <div class="main-prediction">
+                        <div class="prediction-label">Predicted Scene:</div>
+                        <div class="prediction-value" id="predictedClass"></div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceFill"></div>
+                        </div>
+                        <div class="confidence-text" id="confidenceText"></div>
+                    </div>
 
-    ['dragenter', 'dragover'].forEach(evt => {
-      dropzone.addEventListener(evt, e => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropzone.classList.add('drag');
-      });
-    });
+                    <div class="all-predictions">
+                        <h3>All Predictions:</h3>
+                        <div id="allPredictions"></div>
+                    </div>
 
-    ['dragleave', 'drop'].forEach(evt => {
-      dropzone.addEventListener(evt, e => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropzone.classList.remove('drag');
-      });
-    });
+                    <button class="try-another-btn" onclick="resetUpload()">
+                        <i class="fas fa-redo"></i> Try Another Image
+                    </button>
+                </div>
+            </div>
 
-    dropzone.addEventListener('drop', e => {
-      const file = e.dataTransfer.files[0];
-      if (file) {
-        input.files = e.dataTransfer.files;
-        showPreview(file);
-      }
-    });
+            <div class="loading-section" id="loadingSection" style="display: none;">
+                <div class="loader"></div>
+                <p>Analyzing your image...</p>
+            </div>
+        </main>
 
-    input.addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (file) {
-        showPreview(file);
-      }
-    });
+        <footer>
+            <p>Powered by TensorFlow & Flask | <i class="fas fa-brain"></i> Deep Learning</p>
+        </footer>
+    </div>
 
-    function showPreview(file) {
-      const reader = new FileReader();
-      reader.onload = evt => {
-        previewImg.src = evt.target.result;
-        previewName.textContent = file.name;
-        preview.hidden = false;
-      };
-      reader.readAsDataURL(file);
-    }
-  </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
