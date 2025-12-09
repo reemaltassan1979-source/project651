@@ -1,0 +1,230 @@
+:root {
+  --bg: linear-gradient(135deg, #0b1f2a 0%, #102f3b 35%, #0a4d56 100%);
+  --card: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.1);
+  --text: #e7f3ff;
+  --muted: #b7c6d3;
+  --accent: #7be0c3;
+  --accent-strong: #2ad1a3;
+  --shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+  --radius: 20px;
+  font-family: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 20px 64px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 12px 0 10px;
+  font-size: 40px;
+  letter-spacing: -0.5px;
+}
+
+.lede {
+  margin: 0;
+  color: var(--muted);
+  max-width: 720px;
+  margin-inline: auto;
+  line-height: 1.6;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.upload form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.dropzone.drag {
+  border-color: var(--accent);
+  background: rgba(123, 224, 195, 0.08);
+  transform: translateY(-2px);
+}
+
+.drop-icon {
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.dz-title {
+  font-size: 18px;
+  margin: 0;
+}
+
+.dz-sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.preview {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 12px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.preview img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.preview p {
+  margin: 0;
+  color: #fefefe;
+}
+
+.button {
+  appearance: none;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color: #051014;
+  padding: 14px 16px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 12px 24px rgba(42, 209, 163, 0.35);
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+}
+
+.badge {
+  align-self: flex-start;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(123, 224, 195, 0.18);
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.result-label {
+  margin: 0;
+  font-size: 30px;
+  letter-spacing: -0.3px;
+}
+
+.confidence {
+  margin: 0;
+  color: var(--muted);
+}
+
+.top3 {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.top-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+}
+
+.placeholder {
+  color: var(--muted);
+}
+
+.flash-area {
+  margin-bottom: 16px;
+}
+
+.flash {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.flash.error {
+  border-color: #ff9b9b;
+  color: #ffd7d7;
+}
+
+@media (max-width: 640px) {
+  h1 { font-size: 32px; }
+  .card { padding: 20px; }
+  .preview { grid-template-columns: 72px 1fr; }
+}

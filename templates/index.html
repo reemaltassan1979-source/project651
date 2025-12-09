@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scene Classifier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <p class="eyebrow">Intel Image Scene Model</p>
+      <h1>Classify an image in seconds</h1>
+      <p class="lede">Drop a photo and our Keras model will predict the scene. Supported classes: buildings, forest, glacier, mountain, sea, street.</p>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-area">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <main class="layout">
+      <section class="card upload">
+        <form id="upload-form" action="/" method="POST" enctype="multipart/form-data">
+          <label for="image" class="dropzone" id="dropzone">
+            <div class="drop-icon">⬆</div>
+            <div>
+              <p class="dz-title">Upload or drop an image</p>
+              <p class="dz-sub">JPG, PNG, or GIF up to 8MB</p>
+            </div>
+            <input id="image" name="image" type="file" accept="image/*" required hidden />
+          </label>
+          <div class="preview" id="preview" hidden>
+            <img id="preview-img" alt="Preview" />
+            <p id="preview-name"></p>
+          </div>
+          <button type="submit" class="button">Run Classification</button>
+        </form>
+      </section>
+
+      <section class="card results">
+        {% if prediction %}
+          <div class="badge">Top class</div>
+          <h2 class="result-label">{{ prediction.label|capitalize }}</h2>
+          <p class="confidence">Confidence: {{ prediction.confidence }}</p>
+          <div class="top3">
+            {% for label, score in prediction.top3 %}
+              <div class="top-item">
+                <span>{{ label|capitalize }}</span>
+                <span>{{ '%.1f' % (score * 100) }}%</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="placeholder">
+            <p>No prediction yet.</p>
+            <p class="muted">Upload an image to see model results.</p>
+          </div>
+        {% endif %}
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const dropzone = document.getElementById('dropzone');
+    const input = document.getElementById('image');
+    const preview = document.getElementById('preview');
+    const previewImg = document.getElementById('preview-img');
+    const previewName = document.getElementById('preview-name');
+
+    dropzone.addEventListener('click', () => input.click());
+
+    ['dragenter', 'dragover'].forEach(evt => {
+      dropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('drag');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(evt => {
+      dropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('drag');
+      });
+    });
+
+    dropzone.addEventListener('drop', e => {
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        input.files = e.dataTransfer.files;
+        showPreview(file);
+      }
+    });
+
+    input.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) {
+        showPreview(file);
+      }
+    });
+
+    function showPreview(file) {
+      const reader = new FileReader();
+      reader.onload = evt => {
+        previewImg.src = evt.target.result;
+        previewName.textContent = file.name;
+        preview.hidden = false;
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
